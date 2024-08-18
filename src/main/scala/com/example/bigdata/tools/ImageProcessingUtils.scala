@@ -10,32 +10,30 @@ import java.nio.file.{Files, Paths}
 object ImageProcessingUtils {
 
   def imageMeasurements(content: Array[Byte]): (Int, Int, Double, Double, Double, Double) = {
-    try {
-      // Konwersja Array[Byte] do Mat
-      val matOfByte = new Mat(content: _*)
-      val mat = imdecode(matOfByte, IMREAD_GRAYSCALE)
+    // Konwersja Array[Byte] do Mat
+    val matOfByte = new Mat(content: _*)
+    val mat = imdecode(matOfByte, IMREAD_GRAYSCALE)
 
-      // Sprawdzenie, czy obraz został poprawnie załadowany
-      if (mat.empty()) {
-        System.err.println("Warning: Failed to decode image")
-        return (0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN)
-      }
-
-      // Pobierz wymiary obrazu
-      val height = mat.rows()
-      val width = mat.cols()
-
-      // Oblicz kontrast i średnią jasność
-      val mean = new Mat()
-      val stdDev = new Mat()
-      meanStdDev(mat, mean, stdDev)
-      val contrast = stdDev.ptr().getDouble(0)
-      val meanIntensity = mean.ptr().getDouble(0)
-      val blur = computeBlur(mat)
-      val edgeRatio = computeEdgeRatio(mat)
-
-      (height, width, contrast, meanIntensity, blur, edgeRatio)
+    // Sprawdzenie, czy obraz został poprawnie załadowany
+    if (mat.empty()) {
+      System.err.println("Warning: Failed to decode image")
+      return (0, 0, 0d, 0d, 0d, 0d)
     }
+
+    // Pobierz wymiary obrazu
+    val height = mat.rows()
+    val width = mat.cols()
+
+    // Oblicz kontrast i średnią jasność
+    val mean = new Mat()
+    val stdDev = new Mat()
+    meanStdDev(mat, mean, stdDev)
+    val contrast = stdDev.ptr().getDouble(0)
+    val meanIntensity = mean.ptr().getDouble(0)
+    val blur = computeBlur(mat)
+    val edgeRatio = computeEdgeRatio(mat)
+
+    (height, width, contrast, meanIntensity, blur, edgeRatio)
   }
 
   // Stosunek liczby pikseli krawędzi do całkowitej liczby pikseli w obrazie.

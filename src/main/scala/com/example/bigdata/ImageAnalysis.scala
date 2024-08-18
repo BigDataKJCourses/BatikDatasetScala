@@ -11,7 +11,7 @@ object ImageAnalysis {
     //TODO: Utwórz poprawny kontekst dla Spark SQL
 
 
-    if (args.length == 1 || args(1) != "dataset") {
+    if (args.length >= 1 && args(1) != "dataset") {
       // Tu wstaw implementację dla DataFrame API
 
 
