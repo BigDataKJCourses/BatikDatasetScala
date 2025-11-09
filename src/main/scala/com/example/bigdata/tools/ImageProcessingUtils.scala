@@ -1,18 +1,39 @@
 package com.example.bigdata.tools
 
+import org.bytedeco.javacpp.BytePointer
 import org.bytedeco.opencv.global.opencv_core._
 import org.bytedeco.opencv.global.opencv_imgcodecs._
 import org.bytedeco.opencv.global.opencv_imgproc.{Canny, Laplacian}
 import org.bytedeco.opencv.opencv_core.Mat
 
+import java.nio.ByteBuffer
 import java.nio.file.{Files, Paths}
 
 object ImageProcessingUtils {
 
+  private def decodeImage(content: Array[Byte]): Mat = {
+    val buffer = ByteBuffer.allocateDirect(content.length)
+
+    buffer.put(content)
+    buffer.flip()
+
+    try {
+      val bytePointer = new BytePointer(buffer)
+
+      val matOfByte = new Mat(1, content.length, CV_8UC1, bytePointer)
+
+      try {
+        return imdecode(matOfByte, IMREAD_GRAYSCALE)
+      } finally {
+        matOfByte.close()
+      }
+    }
+  }
+
   def imageMeasurements(content: Array[Byte]): (Int, Int, Double, Double, Double, Double) = {
+
     // Konwersja Array[Byte] do Mat
-    val matOfByte = new Mat(content: _*)
-    val mat = imdecode(matOfByte, IMREAD_GRAYSCALE)
+    val mat = decodeImage(content)
 
     // Sprawdzenie, czy obraz został poprawnie załadowany
     if (mat.empty()) {
@@ -54,7 +75,7 @@ object ImageProcessingUtils {
   }
 
   def main(args: Array[String]): Unit = {
-    val filePath = "C:\\Users\\kjankiewicz\\Downloads\\archive_batik\\batik-tambal\\1.jpg" // Podaj pełną ścieżkę do pliku z obrazem
+    val filePath = "/tmp/batik/batik-tambal/1.jpg" // Podaj pełną ścieżkę do pliku z obrazem
 
     try {
       // Odczyt pliku jako Array[Byte]
