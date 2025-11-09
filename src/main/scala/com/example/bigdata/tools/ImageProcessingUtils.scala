@@ -17,16 +17,14 @@ object ImageProcessingUtils {
     buffer.put(content)
     buffer.flip()
 
+    val bytePointer = new BytePointer(buffer)
+
+    val matOfByte = new Mat(1, content.length, CV_8UC1, bytePointer)
+
     try {
-      val bytePointer = new BytePointer(buffer)
-
-      val matOfByte = new Mat(1, content.length, CV_8UC1, bytePointer)
-
-      try {
-        return imdecode(matOfByte, IMREAD_GRAYSCALE)
-      } finally {
-        matOfByte.close()
-      }
+      return imdecode(matOfByte, IMREAD_GRAYSCALE)
+    } finally {
+      matOfByte.close()
     }
   }
 
